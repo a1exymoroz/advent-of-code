@@ -98,7 +98,9 @@ export class MazeSolverService {
     let minPath: PathStep[] = [];
 
     while (queue.length > 0) {
-      const [currX, currY, currentCost, direction, path] = queue.shift();
+      const item = queue.shift();
+      if (!item) break;
+      const [currX, currY, currentCost, direction, path] = item;
       const stateKey = `${currX},${currY},${direction}`;
 
       if (visited.has(stateKey)) {

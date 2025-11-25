@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { MazeSolverService, PathStep } from '../services/maze-solver.service';
 
 @Component({
@@ -52,15 +53,29 @@ export class MazeVisualizerComponent implements OnInit {
 #S#.............#
 #################`;
 
-  constructor(private mazeSolver: MazeSolverService) {}
+  constructor(
+    private mazeSolver: MazeSolverService,
+    private http: HttpClient
+  ) {}
 
   ngOnInit() {
     this.loadTestData(1);
   }
 
   loadTestData(testNumber: number) {
-    const data = testNumber === 1 ? this.testData1 : this.testData2;
-    this.solveMaze(data, true);
+    if (testNumber === 3) {
+      this.http.get('assets/16.txt', { responseType: 'text' }).subscribe({
+        next: (data) => {
+          this.solveMaze(data, false);
+        },
+        error: (err) => {
+          console.error('Error loading test data 3:', err);
+        }
+      });
+    } else {
+      const data = testNumber === 1 ? this.testData1 : this.testData2;
+      this.solveMaze(data, true);
+    }
   }
 
   onFileSelected(event: any) {
