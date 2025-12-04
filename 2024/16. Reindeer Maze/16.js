@@ -48,31 +48,6 @@ const findInitialDirections = (grid, x, y) => {
     return directions;
 }
 
-const findOtherPossiblePaths = ( paths, visitedPaths, grid) => {
-    const allPaths = [];
-
-    for (const {path} of paths) {
-        for (let i = path.length - 1; i >= 0; i--) {
-            const {x, y, direction} = path[i];
-            const nextKey = `${x},${y}`;
-            if (visitedPaths.get(nextKey).length > 1) {
-            console.log('visitedPaths.get(nextKey)', visitedPaths.get(nextKey));
-
-            }
-            // const existingPaths = visitedPaths.get(nextKey).filter(p => p[p.length - 1].direction !== direction);
-            // if (existingPaths.length > 0) {
-            //     for (const existingPath of existingPaths) {
-            //         const slicedPath = path.slice(i, path.length);
-            //         allPaths.push([...existingPath, ...slicedPath]);
-            //     }
-            // }
-        } 
-        allPaths.push(path);
-    }
-
-    return allPaths;
-}
-
 const findPossiblePaths = (grid, x, y, isTestData = true) => {
 
   const queue = [];
@@ -123,6 +98,67 @@ const findPossiblePaths = (grid, x, y, isTestData = true) => {
   return {minCost, minPath, newGrid: gridCopy};
 }
 
+const findOptimalPath = (grid, x, y, optimalPath) => {
+
+    const optimalPathMap = new Map(optimalPath.map(p => [`${p.x},${p.y}`, p]));
+
+    const queue = [];
+    const gridCopy = grid.map(row => [...row]);
+    gridCopy[y][x] = 0;
+    queue.push([x, y, 0, '^', [{x, y, direction: '^', cost: 0}]]);
+
+    while (queue.length > 0) {
+        const [currX, currY, currentCost, direction, path] = queue.shift();
+    
+        const moves = [
+            { direction: direction, cost: currentCost + 1 }, // Move forward
+            { direction: TURN_LEFT[direction], cost: currentCost + 1001 }, // Turn left then move
+            { direction: TURN_RIGHT[direction], cost: currentCost + 1001 } // Turn right then move
+        ];
+    
+        for (const {direction, cost} of moves) {
+            const [dx, dy] = DIRECTIONS[direction];
+            const nextX = currX + dx;
+            const nextY = currY + dy;
+    
+            if (gridCopy[nextY][nextX] === '#') {
+                continue;
+            }
+    
+            if (gridCopy[nextY][nextX] === 'E') {
+                continue;
+            }
+    
+            if (gridCopy[nextY][nextX] === '.' || gridCopy[nextY][nextX] > cost) {
+                gridCopy[nextY][nextX] = cost;
+                queue.push([nextX, nextY, cost, direction, [...path, {x: nextX, y: nextY, direction, cost}]]);
+            }
+  
+            if (optimalPathMap.has(`${nextX},${nextY}`) && !optimalPathMap.has(`${currX},${currY}`)) {
+                return [...path, {x: nextX, y: nextY, direction, cost}];
+            }
+        }
+    }
+
+    return null;
+}
+
+const findOtherPossiblePaths = (grid, x, y, optimalPath) => {
+    const otherPossiblePaths = [optimalPath];
+
+    let currentOptimalPath = optimalPath;
+
+    while (currentOptimalPath) {
+        currentOptimalPath = findOptimalPath(grid, x, y, otherPossiblePaths.flat());
+        if (currentOptimalPath) {
+            otherPossiblePaths.push(currentOptimalPath);
+        }
+    }
+
+
+    return otherPossiblePaths;
+}
+
 const reindeerMaze = (input, isTestData = true) => {
 
     const lines = input.trim().split('\n').map(line => line.split(''));
@@ -133,13 +169,24 @@ const reindeerMaze = (input, isTestData = true) => {
     return minCost;
 }
 
-const markVisitedPaths = (grid, path, newGrid) => {
+const markVisitedPaths = (grid, paths, newGrid) => {
 
-    for (const {x, y} of path) {
-        grid[y][x] = 'O';
+    for (const path of paths) {
+        for (const {x, y} of path) {
+            grid[y][x] = 'O';
+        }
     }
 
-    return newGrid;
+    let count = 0;
+    for (const row of grid) {
+        for (const cell of row) {
+            if (cell === 'O') {
+                count++;
+            }
+        }
+    }
+
+    return {grid, count};
 }
 
 const reindeerMaze2 = (input, isTestData = true) => {
@@ -149,9 +196,10 @@ const reindeerMaze2 = (input, isTestData = true) => {
 
     const {minCost, minPath, newGrid} = findPossiblePaths(lines, x, y, isTestData);
 
-    const grid = markVisitedPaths(lines, minPath, newGrid);
+    const otherPossiblePaths = findOtherPossiblePaths(lines, x, y, minPath);
 
-    return minCost;
+    const {grid, count} = markVisitedPaths(lines, [minPath, ...otherPossiblePaths], newGrid);
+    return count;
 }
 
 const testData = `###############
@@ -189,19 +237,19 @@ const testData2 = `#################
 #################`;
 
 console.log('=== Test Results ===');
-// console.log('Part 1 (Expected: 7036):', reindeerMaze(testData));
-// console.log('Part 1 (Expected: 11048):', reindeerMaze(testData2));
+console.log('Part 1 (Expected: 7036):', reindeerMaze(testData));
+console.log('Part 1 (Expected: 11048):', reindeerMaze(testData2));
 
 console.log('Part 2 (Expected: 45):', reindeerMaze2(testData));
-// console.log('Part 2 (Expected: 64):', reindeerMaze(testData2));
+console.log('Part 2 (Expected: 64):', reindeerMaze2(testData2));
 
 
 const inputPath = path.join(__dirname, '16.txt');
 try {
     const data = fs.readFileSync(inputPath, 'utf8');
     console.log('\n=== Actual Results ===');
-    // console.log('Part 1: 107512', reindeerMaze(data, false));
-    // console.log('Part 2:', reindeerMaze(data));
+    console.log('Part 1: 107512', reindeerMaze(data, false));
+    console.log('Part 2:', reindeerMaze2(data, false));
 
     
 } catch (err) {
