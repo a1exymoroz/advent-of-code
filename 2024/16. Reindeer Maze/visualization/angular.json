@@ -19,14 +19,39 @@
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "assets": ["src/assets"],
-            "styles": ["src/styles.css"]
-          }
+            "styles": ["src/styles.css"],
+            "sourceMap": true,
+            "optimization": false,
+            "extractLicenses": false
+          },
+          "configurations": {
+            "production": {
+              "sourceMap": false,
+              "optimization": true,
+              "extractLicenses": true
+            },
+            "development": {
+              "sourceMap": true,
+              "optimization": false,
+              "extractLicenses": false
+            }
+          },
+          "defaultConfiguration": "development"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "buildTarget": "reindeer-maze:build"
-          }
+            "buildTarget": "reindeer-maze:build:development"
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "reindeer-maze:build:production"
+            },
+            "development": {
+              "buildTarget": "reindeer-maze:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
         }
       }
     }

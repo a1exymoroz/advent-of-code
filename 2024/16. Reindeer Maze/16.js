@@ -95,6 +95,8 @@ const findPossiblePaths = (grid, x, y, isTestData = true) => {
      minCost = minCost - 2000;
   }
 
+  console.log('minCost ', minCost);
+
   return {minCost, minPath, newGrid: gridCopy};
 }
 
@@ -134,7 +136,9 @@ const findOptimalPath = (grid, x, y, optimalPath) => {
                 queue.push([nextX, nextY, cost, direction, [...path, {x: nextX, y: nextY, direction, cost}]]);
             }
   
-            if (optimalPathMap.has(`${nextX},${nextY}`) && !optimalPathMap.has(`${currX},${currY}`)) {
+            if (optimalPathMap.has(`${nextX},${nextY}`) && !optimalPathMap.has(`${currX},${currY}`) && optimalPathMap.get(`${nextX},${nextY}`).cost + 1000 === cost) {
+                console.log('found better path');
+                console.log('cost ', cost, 'optimalCost ', optimalPathMap.get(`${nextX},${nextY}`).cost);
                 return [...path, {x: nextX, y: nextY, direction, cost}];
             }
         }

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { MazeSolverService, PathStep } from '../services/maze-solver.service';
+import { MazeSolverService, PathStep, MazeSolution } from '../services/maze-solver.service';
 
 @Component({
   selector: 'app-maze-visualizer',
@@ -13,11 +13,13 @@ import { MazeSolverService, PathStep } from '../services/maze-solver.service';
 })
 export class MazeVisualizerComponent implements OnInit {
   grid: string[][] = [];
-  solution: { minCost: number; minPath: PathStep[]; grid: string[][] } | null = null;
+  solution: MazeSolution | null = null;
   currentStep: number = 0;
   isPlaying: boolean = false;
   animationSpeed: number = 100;
   private animationInterval: any;
+  private currentInput: string = '';
+  private currentIsTestData: boolean = true;
 
   testData1 = `###############
 #.......#....E#
@@ -91,8 +93,11 @@ export class MazeVisualizerComponent implements OnInit {
   }
 
   solveMaze(input: string, isTestData: boolean) {
-    this.solution = this.mazeSolver.solveMaze(input, isTestData);
+    this.currentInput = input;
+    this.currentIsTestData = isTestData;
     this.grid = input.trim().split('\n').map(line => line.split(''));
+    
+    this.solution = this.mazeSolver.solveMaze(input, isTestData);
     
     // Add start position to path if not already included
     if (this.solution && this.solution.minPath.length > 0) {

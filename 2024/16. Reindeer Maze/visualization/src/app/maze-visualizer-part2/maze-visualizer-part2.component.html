@@ -1,0 +1,40 @@
+<div class="controls">
+  <button (click)="loadTestData(1)">Load Test 1</button>
+  <button (click)="loadTestData(2)">Load Test 2</button>
+  <button (click)="loadTestData(3)">Load Test 3 (16.txt)</button>
+  <input type="file" (change)="onFileSelected($event)" accept=".txt">
+  
+  <div class="speed-control">
+    <label>Speed:</label>
+    <input type="range" min="50" max="500" [(ngModel)]="animationSpeed" [disabled]="isPlaying">
+    <span>{{animationSpeed}}ms</span>
+  </div>
+  
+  <button (click)="playAnimation()" [disabled]="!solutionPart2 || isPlaying">Play</button>
+  <button (click)="stopAnimation()" [disabled]="!isPlaying">Stop</button>
+  <button (click)="resetAnimation()" [disabled]="!solutionPart2">Reset</button>
+  <button (click)="stepBackward()" [disabled]="!solutionPart2 || currentStep === 0">← Step</button>
+  <button (click)="stepForward()" [disabled]="!solutionPart2 || currentStep >= pathLength - 1">Step →</button>
+</div>
+
+<div class="info" *ngIf="solutionPart2">
+  <div class="info-item"><strong>Minimum Cost:</strong> {{totalCost}}</div>
+  <div class="info-item"><strong>Optimal Paths:</strong> {{optimalPathsCount}}</div>
+  <div class="info-item"><strong>Visited Cells:</strong> {{visitedCellCount}}</div>
+  <div class="info-item"><strong>Current Step:</strong> {{currentStep}} / {{pathLength > 0 ? pathLength - 1 : 0}}</div>
+  <div class="info-item"><strong>Current Cost:</strong> {{currentCost}}</div>
+</div>
+
+<div class="maze-container">
+  <div class="maze">
+    <div *ngFor="let row of grid; let y = index" style="display: block; white-space: nowrap;">
+      <span *ngFor="let cell of row; let x = index" 
+            [class]="getCellClass(x, y)"
+            [ngStyle]="getCellStyle(x, y)"
+            class="cell">
+        {{getCellContent(x, y)}}
+      </span>
+    </div>
+  </div>
+</div>
+

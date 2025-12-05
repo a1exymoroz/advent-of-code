@@ -20,6 +20,14 @@ export interface MazeSolution {
   grid: string[][];
 }
 
+export interface MazeSolutionPart2 {
+  minCost: number;
+  allOptimalPaths: PathStep[][];
+  visitedCells: Set<string>;
+  visitedCellCount: number;
+  grid: string[][];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -169,6 +177,148 @@ export class MazeSolverService {
     }
 
     return { minCost: minCostToEnd, minPath, grid: gridCopy };
+  }
+
+  solveMazePart2(input: string, isTestData: boolean = true): MazeSolutionPart2 {
+    const grid = input.trim().split('\n').map(line => line.split(''));
+    const start = this.findStartingPosition(grid);
+
+    if (!start) {
+      return { 
+        minCost: Infinity, 
+        allOptimalPaths: [], 
+        visitedCells: new Set(), 
+        visitedCellCount: 0,
+        grid 
+      };
+    }
+
+    // First, find the minimum cost and one optimal path
+    const part1Solution = this.findPossiblePaths(grid, start.x, start.y, isTestData);
+    const minCost = part1Solution.minCost;
+    const minPath = part1Solution.minPath;
+
+    if (minCost === Infinity || !minPath) {
+      return {
+        minCost: Infinity,
+        allOptimalPaths: [],
+        visitedCells: new Set(),
+        visitedCellCount: 0,
+        grid: part1Solution.grid
+      };
+    }
+
+    // Find all other optimal paths using the same approach as JavaScript
+    const allOptimalPaths = this.findOtherPossiblePaths(grid, start.x, start.y, minPath);
+
+    // Collect all unique cells visited by any optimal path
+    const visitedCells = new Set<string>();
+    for (const path of allOptimalPaths) {
+      for (const step of path) {
+        visitedCells.add(`${step.x},${step.y}`);
+      }
+    }
+
+    return {
+      minCost,
+      allOptimalPaths,
+      visitedCells,
+      visitedCellCount: visitedCells.size,
+      grid: part1Solution.grid
+    };
+  }
+
+  private findOptimalPath(
+    grid: string[][],
+    x: number,
+    y: number,
+    optimalPath: PathStep[]
+  ): PathStep[] | null {
+    const optimalPathMap = new Map<string, PathStep>();
+    for (const p of optimalPath) {
+      optimalPathMap.set(`${p.x},${p.y}`, p);
+    }
+
+    const queue: Array<[number, number, number, string, PathStep[]]> = [];
+    const costs = new Map<string, number>();
+    costs.set(`${x},${y}`, 0);
+    queue.push([x, y, 0, '^', [{ x, y, direction: '^', cost: 0 }]]);
+
+    while (queue.length > 0) {
+      const item = queue.shift();
+      if (!item) break;
+      const [currX, currY, currentCost, direction, path] = item;
+
+      const moves = [
+        { direction: direction, cost: currentCost + 1 },
+        { direction: this.TURN_LEFT[direction], cost: currentCost + 1001 },
+        { direction: this.TURN_RIGHT[direction], cost: currentCost + 1001 }
+      ];
+
+      for (const move of moves) {
+        if (!move.direction || !this.DIRECTIONS[move.direction]) {
+          continue;
+        }
+
+        const [dx, dy] = this.DIRECTIONS[move.direction];
+        const nextX = currX + dx;
+        const nextY = currY + dy;
+
+        if (!grid[nextY] || !grid[nextY][nextX]) {
+          continue;
+        }
+
+        if (grid[nextY][nextX] === '#') {
+          continue;
+        }
+
+        if (grid[nextY][nextX] === 'E') {
+          continue;
+        }
+
+        const cellKey = `${nextX},${nextY}`;
+        const existingCost = costs.get(cellKey);
+        if (grid[nextY][nextX] === '.' || (existingCost === undefined || existingCost > move.cost)) {
+          costs.set(cellKey, move.cost);
+          queue.push([
+            nextX,
+            nextY,
+            move.cost,
+            move.direction,
+            [...path, { x: nextX, y: nextY, direction: move.direction, cost: move.cost }]
+          ]);
+        }
+
+        const optimalStep = optimalPathMap.get(`${nextX},${nextY}`);
+        const currentStep = optimalPathMap.get(`${currX},${currY}`);
+        if (optimalStep && !currentStep && optimalStep.cost + 1000 === move.cost) {
+          return [...path, { x: nextX, y: nextY, direction: move.direction, cost: move.cost }];
+        }
+      }
+    }
+
+    return null;
+  }
+
+  private findOtherPossiblePaths(
+    grid: string[][],
+    x: number,
+    y: number,
+    optimalPath: PathStep[]
+  ): PathStep[][] {
+    const otherPossiblePaths: PathStep[][] = [optimalPath];
+
+    let currentOptimalPath: PathStep[] | null = optimalPath;
+
+    while (currentOptimalPath) {
+      const allKnownPaths = otherPossiblePaths.flat();
+      currentOptimalPath = this.findOptimalPath(grid, x, y, allKnownPaths);
+      if (currentOptimalPath) {
+        otherPossiblePaths.push(currentOptimalPath);
+      }
+    }
+
+    return otherPossiblePaths;
   }
 }
 
