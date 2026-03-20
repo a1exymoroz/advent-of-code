@@ -14,12 +14,22 @@ const testData = `3-5
 32`;
 
 const cafeteria = (input) => {
-    const lines = input.trim().split('\n');
-    const numbers = lines.map(line => line.split('-').map(Number));
-    return numbers.reduce((acc, curr) => acc + curr[1] - curr[0] + 1, 0);
+    const [ranges, numbers] = input.trim().split('\n\n');
+    const rangeNumbers = ranges.split('\n').map(line => line.split('-').map(Number));
+    const numberNumbers = numbers.split('\n').map(line => parseInt(line));
+    let count = 0;
+    for (const number of numberNumbers) {
+        for (const range of rangeNumbers) {
+            if (number >= range[0] && number <= range[1]) {
+                count++;
+                break;
+            }
+        }
+    }
+    return count;
 }
 
-console.log('Part 1: 13', cafeteria(testData));
+console.log('Part 1: 3', cafeteria(testData));
 // console.log('Part 2: 43', cafeteria(testData));
 
 
@@ -28,8 +38,9 @@ console.log('Part 1: 13', cafeteria(testData));
 const inputPath = path.join(__dirname, 'input.txt');
 try {
     const data = fs.readFileSync(inputPath, 'utf8');
+    console.log('Part 2: 13', cafeteria(data));
+
     // console.log('Part 1: 13', printingDepartment(data));
-    // console.log('Part 2: 13', cafeteria(data));
 } catch (err) {
     console.error('Error reading the input file:', err);
 }
