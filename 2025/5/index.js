@@ -29,8 +29,51 @@ const cafeteria = (input) => {
     return count;
 }
 
-console.log('Part 1: 3', cafeteria(testData));
-// console.log('Part 2: 43', cafeteria(testData));
+const cafeteria2 = (input) => {
+    const [ranges, numbers] = input.trim().split('\n\n');
+    const rangeNumbers = ranges.split('\n').map(line => line.split('-').map(Number));
+    const numberNumbers = numbers.split('\n').map(line => parseInt(line));
+    const rangeMap = [];
+    for (const range of rangeNumbers) {
+        const [start, end] = range;
+        let isOverlap = false;
+        for(const currentRange of rangeMap) {
+            // start 16 end 20 and currentRange 12,18
+            // Inside
+            if (start >= currentRange[0] && end <= currentRange[1]) {
+                isOverlap = true;
+                break;
+            }
+            // Outside
+            if (start < currentRange[0] && end > currentRange[1]) {
+                isOverlap = true;
+                currentRange[0] = start;
+                currentRange[1] = end;
+                break;
+            }
+            // Left Overlap
+            if (start < currentRange[0] && end > currentRange[0]) {
+                isOverlap = true;
+                currentRange[0] = start;
+                break;
+            }
+            // Right Overlap
+            if (start < currentRange[1] && end > currentRange[1]) {
+                isOverlap = true;
+                currentRange[1] = end;
+                break;
+            }
+        }
+        if (!isOverlap) {
+            rangeMap.push(range);
+        }
+    }
+    console.log(rangeMap);
+    return rangeMap.length;
+}
+
+// console.log('Part 1: 3', cafeteria(testData));
+console.log('Part 2: 14', cafeteria2(testData));
 
 
 
@@ -38,9 +81,8 @@ console.log('Part 1: 3', cafeteria(testData));
 const inputPath = path.join(__dirname, 'input.txt');
 try {
     const data = fs.readFileSync(inputPath, 'utf8');
-    console.log('Part 2: 13', cafeteria(data));
-
-    // console.log('Part 1: 13', printingDepartment(data));
+    // console.log('Part 2: 511', cafeteria(data));
+    // console.log('Part 2: 13', cafeteria2(data));
 } catch (err) {
     console.error('Error reading the input file:', err);
 }
