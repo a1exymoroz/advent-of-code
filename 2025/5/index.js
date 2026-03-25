@@ -31,8 +31,8 @@ const cafeteria = (input) => {
 
 const cafeteria2 = (input) => {
     const [ranges, numbers] = input.trim().split('\n\n');
-    const rangeNumbers = ranges.split('\n').map(line => line.split('-').map(Number));
-    const numberNumbers = numbers.split('\n').map(line => parseInt(line));
+    const rangeNumbers = ranges.split('\n').map(line => line.split('-').map(Number)).sort((a, b) => a[0] - b[0]);
+    // console.log(rangeNumbers);
     const rangeMap = [];
     for (const range of rangeNumbers) {
         const [start, end] = range;
@@ -58,7 +58,7 @@ const cafeteria2 = (input) => {
                 break;
             }
             // Right Overlap
-            if (start < currentRange[1] && end > currentRange[1]) {
+            if (start <= currentRange[1] && end > currentRange[1]) {
                 isOverlap = true;
                 currentRange[1] = end;
                 break;
@@ -68,8 +68,14 @@ const cafeteria2 = (input) => {
             rangeMap.push(range);
         }
     }
-    console.log(rangeMap);
-    return rangeMap.length;
+
+    // console.log(rangeMap);
+
+    let count = 0;
+    for (const range of rangeMap) {
+        count += range[1] - range[0] + 1;
+    }
+    return count;
 }
 
 // console.log('Part 1: 3', cafeteria(testData));
@@ -82,7 +88,7 @@ const inputPath = path.join(__dirname, 'input.txt');
 try {
     const data = fs.readFileSync(inputPath, 'utf8');
     // console.log('Part 2: 511', cafeteria(data));
-    // console.log('Part 2: 13', cafeteria2(data));
+    console.log('Part 2: 13', cafeteria2(data));
 } catch (err) {
     console.error('Error reading the input file:', err);
 }
