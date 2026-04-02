@@ -33,71 +33,82 @@ const trashCompactor = (input) => {
 }
 
 const trashCompactorPart2 = (input) => {
-    const lines = input.trim().split('\n');
-    // console.log('lines', lines);
-    let numberLength = 0;
-
-    for (let number of lines[0].split(' ')) {
-        if (number.length > numberLength) {
-            numberLength = number.length;
-        }
-    }
-
-    console.log('numberLength', numberLength);
+    const lines = input.split('\n');
     
-    for (let i = 0; i < lines.length; i++) {
-        const array = [];
-        for (let j = 0; j < lines[i].length; j += numberLength) {   
-            const number = lines[i].slice(j, j + numberLength);
-            array.push(number);
-            j++;
-        }
-        lines[i] = array;
+    // Remove trailing empty lines
+    while (lines.length && lines[lines.length - 1].trim() === '') {
+        lines.pop();
     }
-    const operators = lines.pop().map(char => char.trim());
-    // console.log('operators', operators);
-    // console.log('lines', lines);
-
-    // console.log('numberLength', numberLength);
- 
-    const arrays = [];
-    for (let i = 0; i < lines[0].length; i++) {
-        const array = [];
-        for (let j = 0; j < lines.length; j++) {
-            const number = lines[j][i];
-            for (let k = 0; k < numberLength; k++) {
-                array[k] = array[k] ? array[k] + number[k] : number[k];
+    
+    const operatorRow = lines[lines.length - 1];
+    const numberRows = lines.slice(0, lines.length - 1);
+    
+    // Find the width of the grid (max line length)
+    const width = Math.max(...lines.map(l => l.length));
+    
+    // Pad all rows to the same width
+    const paddedRows = numberRows.map(row => row.padEnd(width, ' '));
+    const paddedOperatorRow = operatorRow.padEnd(width, ' ');
+    
+    // Process column by column
+    let problems = [];
+    let currentNumbers = [];
+    let currentOperator = null;
+    
+    for (let col = 0; col < width; col++) {
+        // Build the vertical string for this column (digits top-to-bottom)
+        let colStr = '';
+        for (let row = 0; row < paddedRows.length; row++) {
+            colStr += paddedRows[row][col] || ' ';
+        }
+        
+        const operatorChar = paddedOperatorRow[col];
+        
+        // If column is all spaces and operator is space, we're between problems
+        if (colStr.trim() === '' && operatorChar === ' ') {
+            if (currentNumbers.length > 0 && currentOperator) {
+                problems.push({ numbers: currentNumbers, operator: currentOperator });
+                currentNumbers = [];
+                currentOperator = null;
+            }
+        } else {
+            // This column forms a number (read top-to-bottom)
+            const number = colStr.trim();
+            if (number !== '') {
+                currentNumbers.push(number);
+            }
+            if (operatorChar === '+' || operatorChar === '*') {
+                currentOperator = operatorChar;
             }
         }
-        console.log('before array', array);
-        arrays.push(array.map(value => value.trim()).filter(value => value !== ''));
-        console.log('after array', arrays);
     }
-    // console.log('arrays', arrays);
- 
+    
+    // Don't forget the last problem
+    if (currentNumbers.length > 0 && currentOperator) {
+        problems.push({ numbers: currentNumbers, operator: currentOperator });
+    }
+    
+    // Calculate sum
     let sum = 0;
- 
-    for (let i = 0; i < arrays.length; i++) {
-     const array = arrays[i];
-     const operator = operators[i];
-     if (operator === '+') {
-         sum += array.reduce((acc, num) => acc + Number(num), 0);
-     } else if (operator === '*') {
-         sum += array.reduce((acc, num) => acc * Number(num), 1);
-     }
+    for (const problem of problems) {
+        if (problem.operator === '+') {
+            sum += problem.numbers.reduce((acc, num) => acc + Number(num), 0);
+        } else if (problem.operator === '*') {
+            sum += problem.numbers.reduce((acc, num) => acc * Number(num), 1);
+        }
     }
- 
+    
     return sum;
- }
+}
 
 // console.log('Part 1: 4277556', trashCompactor(testData));
-// console.log('Part 2: 3263827', trashCompactorPart2(testData));
+console.log('Part 2 (test): 3263827', trashCompactorPart2(testData));
 // Read the input file
 const inputPath = path.join(__dirname, 'input.txt');
 try {
     const data = fs.readFileSync(inputPath, 'utf8');
     // console.log('Part 1: 4277556', trashCompactor(data));
-    console.log('Part 2: 23159217', trashCompactorPart2(data));
+    console.log('Part 2 (real):', trashCompactorPart2(data));
 } catch (err) {
     console.error('Error reading the input file:', err);
 }
