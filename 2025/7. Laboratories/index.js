@@ -21,9 +21,24 @@ const testData = `.......S.......
 const laboratories = (input) => {
     const lines = input.split('\n');
     const grid = lines.map(line => line.split(''));
-    const start = grid.findIndex(line => line.includes('S'));
-    const end = grid.findIndex(line => line.includes('E'));
-    return start + end;
+    let count = 0;
+    for (let i = 0; i < grid.length; i++) {
+        for (let j = 0; j < grid[i].length; j++) {
+            if (grid[i][j] === 'S') {
+                grid[i + 1][j] = '|';
+            } else if (grid[i][j] === '^') {
+                grid[i + 1][j + 1] = '|';
+                grid[i + 1][j - 1] = '|';
+            } 
+            else if (i + 1 < grid.length && grid[i][j] === '|' && grid[i][j] !== '^') {
+                grid[i + 1][j] = '|';
+            }
+
+        }
+    }
+
+    console.log(grid.map(line => line.join('')).join('\n'));
+    return count;
 }
 
 console.log('Part 1: 4277556', laboratories(testData));
