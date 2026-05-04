@@ -48,7 +48,29 @@
  * @return {string[]}
  */
 var buildArray = function(target, n) {
-2
+    const output = [];
+    let index = 0;
+    let current = 1;
+
+    for (let i = 1; i <= n; i++) {
+
+        while(true) {
+            if (target[index] === current) {
+                break;
+            }
+            output.push('Push');
+            output.push('Pop');
+            current++;
+        }
+        output.push('Push');
+        current++;
+        index++;
+        if (index >= target.length) {
+            break;
+        }
+    }
+
+    return output;
 };
 
 console.log(buildArray([1,3], 3));
