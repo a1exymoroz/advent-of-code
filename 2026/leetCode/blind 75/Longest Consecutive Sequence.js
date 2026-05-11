@@ -22,7 +22,8 @@ var longestConsecutive = function(nums) {
     let sequence = [nums[0]];
     let longest = 0;
     for (let i = 1; i < nums.length; i++) {
-        if (nums[i] + 1 === nums[i - 1]) {
+        if (nums[i] === nums[i - 1]) continue;
+        if (nums[i] === nums[i - 1] + 1) {
             sequence.push(nums[i]);
         } else {
             sequence = [nums[i]];
@@ -32,22 +33,21 @@ var longestConsecutive = function(nums) {
     return longest;
 }
 
-console.log(longestConsecutive([2,20,4,10,3,4,5]));
-console.log(longestConsecutive([0,3,2,5,4,6,1,1]));
+var longestConsecutive2 = function(nums) {
+    const numSet = new Set(nums);
+    let longest = 0;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    for (let num of numSet) {
+        if (!numSet.has(num - 1)) {
+            let length = 1;
+            while (numSet.has(num + length)) {
+                length++;
+            }
+            longest = Math.max(longest, length);
+        }
+    }
+    return longest;
+}
 
 // const numsSet = new Set(nums);
 // let longest = 0;
@@ -60,3 +60,6 @@ console.log(longestConsecutive([0,3,2,5,4,6,1,1]));
 //     longest = Math.max(longest, length);
 // }
 // return longest;
+
+console.log(longestConsecutive2([2,20,4,10,3,4,5]));
+// console.log(longestConsecutive2([0,3,2,5,4,6,1,1]));
