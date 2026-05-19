@@ -33,32 +33,47 @@
  */
 var minJumps = function(arr) {
     if (arr.length === 1) return 0;
-    let stack = [[0, 0]];
-    let visited = new Set([0]);
-    while (stack.length > 0) {
-        const [current, steps] = stack.pop();
-        if (current === arr.length - 1) return steps;
 
-        let left = current - 1;
-        let right = current + 1;
-        while (left >= 0 || right < arr.length) {
-            if (left >= 0 && !visited.has(left) && arr[current] === arr[left]) {
-                stack.push([left, steps + 1]);
-                visited.add(left);
-                break;
-            }
-            if (right < arr.length && !visited.has(right) && arr[current] === arr[right]) {
-                stack.push([right, steps + 1]);
-                visited.add(right);
-                break;
-            }
-            left--;
-            right++;
-        } 
+    const valueToIndices = new Map();
+    for (let i = 0; i < arr.length; i++) {
+        if (!valueToIndices.has(arr[i])) valueToIndices.set(arr[i], []);
+        valueToIndices.get(arr[i]).push(i);
     }
+
+    const visited = new Set([0]);
+    const queue = [0];
+    let steps = 0;
+
+    while (queue.length > 0) {
+        const size = queue.length;
+        for (let s = 0; s < size; s++) {
+            const i = queue.shift();
+            if (i === arr.length - 1) return steps;
+
+            const value = arr[i];
+            for (const j of valueToIndices.get(value) || []) {
+                if (!visited.has(j)) {
+                    visited.add(j);
+                    queue.push(j);
+                }
+            }
+            valueToIndices.delete(value);
+
+            for (const next of [i - 1, i + 1]) {
+                if (next >= 0 && next < arr.length && !visited.has(next)) {
+                    visited.add(next);
+                    queue.push(next);
+                }
+            }
+        }
+        steps++;
+    }
+
     return -1;
 };
 
 console.log(minJumps([100,-23,-23,404,100,23,23,23,3,404]));
 console.log(minJumps([7]));
 console.log(minJumps([7,6,9,6,9,6,9,7]));
+
+console.log(minJumps([6,1,9]));
