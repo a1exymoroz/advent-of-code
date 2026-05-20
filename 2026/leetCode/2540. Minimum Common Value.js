@@ -20,7 +20,7 @@ var getCommon = function(nums1, nums2) {
     let index1 = 0;
     let index2 = 0;
 
-    while(index1 !== nums1.length - 1 && index2 !== nums2.length - 1) {
+    while(index1 !== nums1.length - 1 || index2 !== nums2.length - 1) {
         if (nums1[index1] === nums2[index2]){
             return nums1[index1];
         }
