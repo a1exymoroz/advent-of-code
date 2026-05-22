@@ -56,3 +56,40 @@ console.log(longestCommonPrefix([1,2,3], [4,4,4]));
 
 console.log(longestCommonPrefix([48,39,49,8,18], [15,49,3,1,29]));
 console.log(longestCommonPrefix([511111, 599999], [591]));
+
+// Algorithm
+// Trie class:
+
+// Initialize the Trie with a root node, which is an instance of TrieNode.
+
+// Inner TrieNode class:
+
+// Each TrieNode has an array children of size 10 (for digits 0-9), initialized to null in the constructor to represent an empty node.
+// Initialize the Trie with a root node, which is an instance of TrieNode.
+
+// insert function:
+
+// Convert the integer num to its string representation numStr.
+// Iterate over each character digit in numStr:
+// Convert digit to its integer index idx.
+// If node.children[idx] is null, create a new TrieNode and assign it to node.children[idx].
+// Move to the child node at node.children[idx].
+// Insert all digits of num into the Trie.
+// findLongestPrefix function:
+
+// Convert the integer num to its string representation numStr.
+// Initialize len to 0 to keep track of the length of the common prefix.
+// Iterate over each character digit in numStr:
+// Convert digit to its integer index idx.
+// If node.children[idx] exists, increment len and move to the child node at node.children[idx].
+// If node.children[idx] is null, break the loop as the prefix match ends.
+// Return len which represents the length of the longest common prefix.
+// longestCommonPrefix function:
+
+// Create an instance of Trie.
+// Insert all numbers from arr1 into the Trie.
+// Initialize longestPrefix to 0.
+// For each number num in arr2:
+// Call trie.findLongestPrefix(num) to find the length of the longest prefix for num in the Trie.
+// Update longestPrefix with the maximum value between longestPrefix and the result from findLongestPrefix.
+// Return longestPrefix as the result, which is the length of the longest common prefix between numbers in arr1 and arr2.
