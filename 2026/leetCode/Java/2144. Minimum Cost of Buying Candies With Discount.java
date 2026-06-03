@@ -57,3 +57,20 @@ class Main {
         System.out.println(result);
     }
 }
+
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.List;
+
+public class FunctionalProgrammingMagic {
+
+    /**
+     * This method generates the cubes of the first n natural numbers.
+     * @param n The number of natural numbers for which cubes are to be calculated.
+     * @return List<Integer> This returns a list of cubes of the first n natural numbers.
+     */
+    public static List<Integer> getCubesOfFirstNNumbers(int n) {
+        // Write your code here
+        return IntStream.range(0, n).map(value -> value * value).boxed().collect(Collectors.toList());
+    }
+}
