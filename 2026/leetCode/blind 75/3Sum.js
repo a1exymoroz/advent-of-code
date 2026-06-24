@@ -81,3 +81,30 @@ console.log(threeSum([-1,0,1,2,-1,-4,-2,-3,3,0,4]));
 
 // [[-4,0,4],[-4,1,3],[-3,-1,4],[-3,0,3],[-3,1,2],[-2,-1,3],[-2,0,2],[-1,-1,2],[-1,0,1]]
 
+
+// Java
+// class Solution {
+//     public List<List<Integer>> threeSum(int[] nums) {
+//         List<List<Integer>> triplets = new ArrayList<>();
+//         Arrays.sort(nums);
+//         for (int i = 0; i < nums.length; i++) {
+//             if (i > 0 && nums[i] == nums[i - 1]) continue;
+//             int target = nums[i];
+//             int left = i + 1;
+//             int right = nums.length - 1;
+//             while (left < right) {
+//                 int sum = target + nums[left] + nums[right];
+//                 if (sum > 0) {
+//                     right--;
+//                 } else if (sum < 0) {
+//                     left++;
+//                 } else {
+//                     triplets.add(Arrays.asList(target, nums[left], nums[right]));
+//                     left++;
+//                     while (nums[left] == nums[left - 1] && left < right) left++;
+//                 }
+//             }
+//         }
+//         return triplets;
+//     }
+// }
