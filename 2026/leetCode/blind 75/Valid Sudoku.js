@@ -80,6 +80,8 @@ var isValidSudoku = function(board) {
 }
 
 var isValidSudoku2 = function(board) {
+    // Bitmasks track which digits 1-9 have already appeared in each row, column,
+    // and 3x3 box. Bit i means digit (i + 1) has been seen.
     let rows = new Array(9).fill(0);
     let cols = new Array(9).fill(0);
     let squares = new Array(9).fill(0);
@@ -88,20 +90,23 @@ var isValidSudoku2 = function(board) {
         for (let c = 0; c < 9; c++) {
             if (board[r][c] === '.') continue;
 
+            // Map '1'..'9' to bit positions 0..8.
             let val = board[r][c] - '1';
+            const box = Math.floor(r / 3) * 3 + Math.floor(c / 3);
 
+            // Duplicate if this digit's bit is already set in the row, column, or box.
             if (
                 rows[r] & (1 << val) ||
                 cols[c] & (1 << val) ||
-                squares[Math.floor(r / 3) * 3 + Math.floor(c / 3)] &
-                    (1 << val)
+                squares[box] & (1 << val)
             ) {
                 return false;
             }
 
+            // Mark the digit as seen in all three groups.
             rows[r] |= 1 << val;
             cols[c] |= 1 << val;
-            squares[Math.floor(r / 3) * 3 + Math.floor(c / 3)] |= 1 << val;
+            squares[box] |= 1 << val;
         }
     }
     return true;

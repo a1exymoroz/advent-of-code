@@ -16,9 +16,12 @@
 // Output: -1
 
 var maxSubArray = function(nums) {
-    let maxSum = nums[0];
-    let currentSum = 0;
+    // Kadane's algorithm: at each index, decide whether to extend the current
+    // subarray or start a new one at nums[i].
+    let maxSum = nums[0];   // best sum seen so far
+    let currentSum = 0;     // best sum ending at the current index
     for (let i = 0; i < nums.length; i++) {
+        // Either extend the running subarray, or drop it and begin at nums[i].
         currentSum = Math.max(nums[i], currentSum + nums[i]);
         maxSum = Math.max(maxSum, currentSum);
     }   

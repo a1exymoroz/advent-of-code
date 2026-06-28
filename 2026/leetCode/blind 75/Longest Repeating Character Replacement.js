@@ -17,19 +17,24 @@
 
 
 var longestRepeatingCharacterReplacement = function(s, k) {
-    let count = new Map();
+    // Sliding window [l, r]: expand r, shrink l when the window is invalid.
+    let count = new Map(); // frequency of each character inside the current window
     let res = 0;
 
     let l = 0,
-        maxf = 0;
+        maxf = 0; // count of the most frequent character in the current window
     for (let r = 0; r < s.length; r++) {
+        // Include s[r] in the window.
         count.set(s[r], (count.get(s[r]) || 0) + 1);
         maxf = Math.max(maxf, count.get(s[r]));
 
+        // Window length minus the dominant character count = chars we must replace.
+        // If that exceeds k, shrink from the left until the window is valid again.
         while (r - l + 1 - maxf > k) {
             count.set(s[l], count.get(s[l]) - 1);
             l++;
         }
+        // Every window here can be turned into one repeated character with at most k replacements.
         res = Math.max(res, r - l + 1);
     }
 
