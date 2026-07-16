@@ -23,6 +23,10 @@ public class PopularCollections {
     // ─────────────────────────────────────────────────────────────────────────
 
     static void listExamples() {
+        // Pre-fill: N items with the same value (e.g. 10 zeros)
+        List<Integer> tenZeros = new ArrayList<>(Collections.nCopies(10, 0)); // mutable
+        List<Integer> fixedTenZeros = Collections.nCopies(10, 0);             // fixed-size, cannot add/remove
+
         // ArrayList — O(1) random access, O(n) insert/remove in middle
         List<Integer> arrayList = new ArrayList<>();
         arrayList.add(1);              // append
@@ -240,6 +244,8 @@ public class PopularCollections {
     static void arrayExamples() {
         int[] arr = {3, 1, 2};
         int[] sized = new int[5];          // default 0
+        int[] tenZeros = new int[10];      // 10 zeros — simplest for LeetCode (int defaults to 0)
+        boolean[] tenFalse = new boolean[10]; // boolean defaults to false
 
         Arrays.sort(arr);                  // in-place ascending
         Arrays.sort(arr, 0, 2);            // sort range [0, 2)
@@ -280,7 +286,8 @@ public class PopularCollections {
         int freq = Collections.frequency(list, 1);
 
         Collections.binarySearch(list, 3);               // list must be sorted
-        Collections.fill(list, 0);
+        Collections.nCopies(10, 0);                      // immutable list of 10 zeros — wrap in ArrayList<> for mutable
+        Collections.fill(list, 0);                       // replace every element in an existing list
         Collections.copy(list, new ArrayList<>(list));   // dest must be >= src size
 
         // Immutable wrappers
