@@ -90,3 +90,42 @@ var gcdSum = function(nums) {
 
 console.log(gcdSum([2,6,4]),2);
 console.log(gcdSum([3,6,2,8]),5);
+
+// class Solution {
+//     public long gcdSum(int[] nums) {
+
+
+//         long max = nums[0];
+//         List<Long> prefixGcd = new ArrayList<>();
+
+//         for (int i = 0; i < nums.length; i++) {
+//             max = Math.max(max, nums[i]);
+//             prefixGcd.add(gcd(nums[i], max));
+//         }
+
+//         Collections.sort(prefixGcd);
+
+//         System.out.println(prefixGcd.toString());
+
+//         long result = 0;
+//         int left = 0;
+//         int right = prefixGcd.size() - 1;
+
+//         while (left < right) {
+//             if (left == right) {
+//                 break;
+//             }
+
+//             result += gcd(prefixGcd.get(left), prefixGcd.get(right));
+//             left++;
+//             right--;
+//         }
+
+//         return result;
+//     }
+
+//     private long gcd(long a, long b) {
+//         if (b == 0) return a;
+//         return gcd(b, a % b);
+//     }
+// }
